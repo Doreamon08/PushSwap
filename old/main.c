@@ -6,7 +6,7 @@
 /*   By: rabbie <rabbie@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 15:43:54 by rabbie            #+#    #+#             */
-/*   Updated: 2021/11/15 22:01:00 by rabbie           ###   ########.fr       */
+/*   Updated: 2022/01/14 20:20:33 by rabbie           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ int	chartonum(char *ch)
 	if (ch)
 		while (ch[i])
 		{
-			// if (!ft_isdigit(*ch))
-			// 	return (0);
 			if (ch[i] == '-')
 			{
 				sign *= -1;
@@ -40,7 +38,7 @@ int	chartonum(char *ch)
 	return (num / 10 * sign);
 }
 
-int sab(int *a)
+int sab(int *a) //sa and sb
 {
 	int temp;
 
@@ -52,7 +50,7 @@ int sab(int *a)
 	return (0);
 }
 
-int *shiftdown(int *a)
+int *shiftdown(int *a) 
 {
 	int i;
 	int *ac;
@@ -83,7 +81,7 @@ int *delfirst(int *ab)
 		return (ab);
 	while (ab[i])
 		ab[i++];
-	abc = malloc(sizeof(int) * i - 1);
+	abc = malloc(sizeof(int) * (i - 1));
 	i = 0;
 	while (ab[i + 1])
 	{
@@ -94,17 +92,16 @@ int *delfirst(int *ab)
 	return (abc);
 }
 
-int pb(int **a, int **b)
+int pab(int **a, int **b) //pa and pb
 {
-	int i;
-
-	i = 0;
+	if (!**a)
+		return (0);
 	*b = shiftdown(*b);
 	*b[0] = *a[0];
 	*a = delfirst(*a);
 }
 
-int	rotate(int *a)
+int	rab(int *a)
 {
 	int	i;
 	int	temp;
@@ -121,43 +118,90 @@ int	rotate(int *a)
 	a[i] = temp;
 	return (0);
 }
+int	rrab(int *ab)
+{
+	int	i;
+	int	temp;
+	int	temp2;
 
+	temp = ab[0];
+	i = 1;
+	if (!ab)
+		return (0);
+	while(ab[i])
+	{
+		if (!ab[i + 1])
+			ab[0] = ab[i];
+		temp2 = ab[i];
+		ab[i] = temp;
+		temp = temp2;
+		i++;
+	}
+	return (0);
+}
 int main(int ag, char **ac)
 {
-	int *a;
-	int *b;
-	int i;
-	int j;
+	int	*a;
+	int	*b;
+	int	i;
+	char *op;
 
-	j = 1;
-	i = 0;
+	op = malloc(sizeof(char) * 4);
+	i = 1;
 	if (ag == 1)
-		return (0);
-	a = malloc(sizeof(int) * (ag));
-	if (!a)
-		return (0);
-	// b = malloc(sizeof(char) * (ag - 1));
-	// if (!b)
-	// 	return (0);
-	while (j < ag)
-		a[i++] = chartonum(ac[j++]);
+	{
+		printf("Error of arguments\n");
+		return (1);
+	}
+	a = malloc(sizeof(int) * (ag - 1));
+	b = malloc(sizeof(int) * (ag - 1));
+	while (i < ag)
+	{
+		if (!ft_isdigit(*ac[i]))
+		{
+			printf("Error: argument <%s> not number\n", ac[i]);
+			return (1);
+		}
+		a[i - 1] = chartonum(ac[i]);
+		// printf("%d - argument is - %d\n", i, chartonum(ac[i]));
+		i++;
+	}
 	i = 0;
-	while (i < ag - 1)
-		printf("%d\n", a[i++]);
-	printf("--------------------\n");
-	rotate(a);
-	i = 0;
-	while (i < ag - 1)
-		printf("%d - a\n", a[i++]);
-	printf("%d - i, %d - a[i]\n", i, a[i - 1]);
-	// printf("%d - a\n", a[0]);
-	// printf("%d - a\n", a[1]);
-	// printf("%d - a\n", a[2]);
-	// printf("%d - a\n", a[3]);
-	// printf("%d - a\n", a[4]);
-	// printf("%d - a\n", a[5]);
-	// printf("---------------\n");	
-	// printf("%d - b\n", b[0]);
-	// printf("%d - b\n", b[1]);
-	// printf("%d - b\n", b[2]);
+	while (1)
+	{
+		while (i < ag - 1)
+		{
+			printf("%d | %d \n", a[i], b[i]);
+			i++;
+		}
+		scanf("%s", op);
+		if (op[0] == 's' && op[1] == 'a')//sa
+			sab(a);
+		else if (op[0] == 's' && op[1] == 'b')//sb
+			sab(b);
+		else if (op[0] == 's' && op[1] == 's')//ss
+			sab(a);
+		else if (op[0] == 'p' && op[1] == 'a')//pa
+			pab(&b, &a);
+		else if (op[0] == 'p' && op[1] == 'b')//pb
+			pab(&a, &b);
+		else if (op[0] == 'r' && op[1] == 'a')//ra
+			rab(a);
+		else if (op[0] == 'r' && op[1] == 'b')//rb
+			rab(b);
+		else if (op[0] == 'r' && op[1] == 'r')//rr
+		{
+			sab(a);
+			sab(b);
+		}
+		else if (op[0] == 'r' && op[1] == 'r' && op[2] == 'a')//rra
+			sab(a);
+		else if (op[0] == 'r' && op[1] == 'r' && op[2] == 'b')//rrb
+			sab(a);
+		else if (op[0] == 'r' && op[1] == 'r' && op[2] == 'r')//rrr
+			sab(a);
+		else
+			printf("incorrect operation");
+		i = 0;
+	}
 }
