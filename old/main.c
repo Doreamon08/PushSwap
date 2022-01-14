@@ -6,7 +6,7 @@
 /*   By: rabbie <rabbie@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 15:43:54 by rabbie            #+#    #+#             */
-/*   Updated: 2022/01/14 20:20:33 by rabbie           ###   ########.fr       */
+/*   Updated: 2022/01/15 00:04:42 by rabbie           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,28 +50,26 @@ int sab(int *a) //sa and sb
 	return (0);
 }
 
-int *shiftdown(int *a) 
+int *shiftdown(int *a, int size) 
 {
 	int i;
 	int *ac;
 
 	i = 0;
-	while (a[i])
-		a[i++];
-	ac = malloc(sizeof(int) * i + 1);
+	ac = malloc(sizeof(int) * size);
 	if (!ac)
 		return (a);
-	i = 0;
-	while (a[i])
+	size--;
+	while (size)
 	{
-		ac[i + 1] = a[i];
-		i++;
+		ac[size] = a[size - 1];
+		size--;
 	}
 	free(a);
 	return (ac);
 }
 
-int *delfirst(int *ab)
+int *delfirst(int *ab, int size)
 {
 	int i;
 	int *abc;
@@ -79,26 +77,25 @@ int *delfirst(int *ab)
 	i = 0;
 	if (!ab)
 		return (ab);
-	while (ab[i])
-		ab[i++];
-	abc = malloc(sizeof(int) * (i - 1));
-	i = 0;
-	while (ab[i + 1])
+	abc = malloc(sizeof(int) * size);
+	// ft_memset(abc, 0, sizeof(int) * i);
+	size--;
+	while (size)
 	{
-		abc[i] = ab[i + 1];
-		i++;
+		abc[size - 1] = ab[size];
+		size--;
 	}
 	free(ab);
 	return (abc);
 }
 
-int pab(int **a, int **b) //pa and pb
+int pab(int **a, int **b, int size) //pa and pb
 {
 	if (!**a)
 		return (0);
-	*b = shiftdown(*b);
+	*b = shiftdown(*b, size);
 	*b[0] = *a[0];
-	*a = delfirst(*a);
+	*a = delfirst(*a, size);
 }
 
 int	rab(int *a)
@@ -182,9 +179,9 @@ int main(int ag, char **ac)
 		else if (op[0] == 's' && op[1] == 's')//ss
 			sab(a);
 		else if (op[0] == 'p' && op[1] == 'a')//pa
-			pab(&b, &a);
+			pab(&b, &a, ag - 1);
 		else if (op[0] == 'p' && op[1] == 'b')//pb
-			pab(&a, &b);
+			pab(&a, &b, ag - 1);
 		else if (op[0] == 'r' && op[1] == 'a')//ra
 			rab(a);
 		else if (op[0] == 'r' && op[1] == 'b')//rb
