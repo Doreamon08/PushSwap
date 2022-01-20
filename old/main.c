@@ -6,7 +6,7 @@
 /*   By: rabbie <rabbie@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/11 15:43:54 by rabbie            #+#    #+#             */
-/*   Updated: 2022/01/19 16:27:06 by rabbie           ###   ########.fr       */
+/*   Updated: 2022/01/19 21:31:11 by rabbie           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ typedef struct s_size
 	int	*b;
 	int	*fic_a;
 	int	*fic_b;
+	int	*sorted;
 	int	sizea;
 	int	sizeb;
 	int	flag;
@@ -174,7 +175,7 @@ int	rrab(int *ab, int size)
 	return (0);
 }
 
-int printer(int *a, int *b, int sizeAg, t_size *size)
+int printer(int sizeAg, t_size *size, int *a, int *b)
 {
 	int	i;
 	int	l;
@@ -184,17 +185,40 @@ int printer(int *a, int *b, int sizeAg, t_size *size)
 	while (sizeAg--)
 	{
 		if (i < size->sizea)
-			printf("%d", a[i++]);
+		{
+			printf("%d | %d", a[i], size->fic_a[i]);
+			i++;
+		}
 		else
-			printf("-");
-		printf(" | ");
+			printf("- | -");
+		printf(" || ");
 		if (l < size->sizeb)
-			printf("%d", b[l++]);
+		{
+			printf("%d | %d", b[l], size->fic_b[l]);
+			l++;
+		}
 		else
-			printf("-");
+			printf("- | -");
 		printf("\n");
 	}
 	return (0);
+}
+
+int	*copyar(int	*ar, int size)
+{
+	int	*copyar;
+	int	i;
+
+	copyar = malloc(sizeof(int) * size);
+	if (!copyar)
+		return (NULL);
+	i = 0;
+	while (i < size)
+	{
+		copyar[i] = ar[i];
+		i++;
+	}
+	return (copyar);
 }
 
 int	*sort(int *a, int size)
@@ -202,7 +226,9 @@ int	*sort(int *a, int size)
 	int	i;
 	int	l;
 	int	temp;
+	int	*sorted;
 
+	sorted = copyar(a, size);
 	i = 1;
 	l = 0;
 	temp = 0;
@@ -210,21 +236,113 @@ int	*sort(int *a, int size)
 	{
 		while (i < size)
 		{
-			if (a[i] < a[l])
+			if (sorted[i] < sorted[l])
 			{
-				temp = a[l];
-				a[l] = a[i];
-				a[i] = temp;
+				temp = sorted[l];
+				sorted[l] = sorted[i];
+				sorted[i] = temp;
 			}
 			i++;
 		}
 		l++;
 		i = l + 1;
 	}
-	return (a);
+	return (sorted);
 }
 
-int	*create_fict();
+int	whattheindex(t_size *size, int i)
+{
+	int	index;
+
+	index = 0;
+	while (index < size->sizea)
+	{
+		if (size->sorted[index] == i)
+		{
+			return (index);
+		}
+		index++;
+	}
+	return (-1);
+}
+
+int	*create_fict(t_size *size)
+{
+	int	*fict_a;
+	int	i;
+	int	l;
+
+	fict_a = malloc(sizeof(int) * size->sizea);
+	if (!fict_a)
+		return (NULL);
+	i = 0;
+	while (i < size->sizea)
+	{
+		fict_a[i] = whattheindex(size, size->a[i]);
+		i++;
+	}
+	return (fict_a);
+}
+
+void complite_sorting(t_size *size, int ag)
+{
+	int	max_num;
+	int	siz;
+	int max_bits;
+	int	i;
+	int	l;
+	int	score;
+
+	i = 0;
+	l = 0;
+	score = 0;
+	max_bits = 0;
+	siz = size->sizea;
+	max_num = size->sizea;
+	while ((max_num >> max_bits) != 0)
+		max_bits++;
+	while (i < max_bits)
+	{
+		while (l < siz)
+		{
+			if ((size->fic_a[0] >> i) & 1 == 1)
+			{
+				// printer(ag, size, size->a, size->b);
+				// printf("////////////////////////\n");
+				rab(size->a, size->sizea);
+				rab(size->fic_a, size->sizea);
+				printf ("ra\n");
+				score++;
+			}
+			else
+			{
+				// printer(ag, size, size->a, size->b);
+				// printf("////////////////////////\n");
+				pab(&size->a, &size->b, size, 'a');
+				size->sizea++;
+				size->sizeb--;
+				pab(&size->fic_a, &size->fic_b, size, 'a');
+				printf ("pb\n");
+				score++;
+			}
+			l++;
+		}
+		while (size->sizeb != 0)
+		{
+			// printer(ag, size, size->a, size->b);
+			// printf("////////////////////////\n");
+			pab(&size->b, &size->a, size, 'b');
+			size->sizeb++;
+			size->sizea--;
+			pab(&size->fic_b, &size->fic_a, size, 'b');
+			printf ("pa\n");
+			score++;
+		}
+		i++;
+		l = 0;
+	}
+	printf ("SCORE - %d\n", score);
+}
 
 int main(int ag, char **ac)
 {
@@ -262,7 +380,19 @@ int main(int ag, char **ac)
 		size->a[i - 1] = chartonum(ac[i]);
 		i++;
 	}
+	size->sorted = sort(size->a, size->sizea);
+	size->fic_a = create_fict(size);
+	size->fic_b = malloc(sizeof(int));
 	i = 0;
+	// while (i < size->sizea)
+	// {
+	// 	printf("//%d - fic-a //\n", size->fic_a[i++]);
+	// }
+	// i = 0;
+	// while (i < size->sizea)
+	// {
+	// 	printf("//%d - sorted //\n", size->sorted[i++]);
+	// }
 	while (1)
 	{
 		// while (i < ag - 1)
@@ -270,39 +400,44 @@ int main(int ag, char **ac)
 		// 	printf("%d | %d \n", a[i], b[i]);
 		// 	i++;
 		// }
-		printer(size->a, size->b, ag - 1, size);
+		printer(ag - 1, size, size->a, size->b);
 		printf("\n");
-		printer(sort(a, size->sizea), b, ag - 1, size);
 		printf("\n%d - sizea, %d - sizeb\n", size->sizea, size->sizeb);
 		printf("%d - score\n", i);
+		complite_sorting(size, ag - 1);
+		printf("\n");
+		printer(ag - 1, size, size->a, size->b);
 		scanf("%s", op);
 		if (op[0] == 's' && op[1] == 'a')//sa
-			sab(a);
+			sab(size->a);
 		else if (op[0] == 's' && op[1] == 'b')//sb
-			sab(b);
+			sab(size->b);
 		else if (op[0] == 's' && op[1] == 's')//ss
-			sab(a);
+		{
+			sab(size->a);
+			sab(size->b);
+		}
 		else if (op[0] == 'p' && op[1] == 'a')//pa
-			pab(&b, &a, size, 'b');
+			pab(&size->b, &size->a, size, 'b');
 		else if (op[0] == 'p' && op[1] == 'b')//pb
-			pab(&a, &b, size, 'a');
+			pab(&size->a, &size->b, size, 'a');
 		else if (op[0] == 'r' && op[1] == 'a')//ra
-			rab(a, size->sizea);
+			rab(size->a, size->sizea);
 		else if (op[0] == 'r' && op[1] == 'b')//rb
-			rab(b, size->sizeb);
+			rab(size->b, size->sizeb);
 		else if (op[0] == 'r' && op[1] == 'r' && !op[2])//rr
 		{
-			rab(a, size->sizea);
-			rab(b, size->sizeb);
+			rab(size->a, size->sizea);
+			rab(size->b, size->sizeb);
 		}
 		else if (op[0] == 'r' && op[1] == 'r' && op[2] == 'a')//rra
-			rrab(a, size->sizea);
+			rrab(size->a, size->sizea);
 		else if (op[0] == 'r' && op[1] == 'r' && op[2] == 'b')//rrb
 			rrab(b, size->sizeb);
 		else if (op[0] == 'r' && op[1] == 'r' && op[2] == 'r')//rrr
 		{
-			rrab(a, size->sizea);
-			rrab(b, size->sizeb);
+			rrab(size->a, size->sizea);
+			rrab(size->b, size->sizeb);
 		}
 		else
 			printf("incorrect operation\n");
